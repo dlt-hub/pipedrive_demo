@@ -12,7 +12,7 @@ import dlt
 import json
 import functools
 import requests
-
+import time
 custom_fields_mapping = {}
 
 
@@ -105,6 +105,8 @@ def _paginated_get(url, headers, params):
     while is_next_page:
         response = requests.get(url, headers=headers, params=params)
         response.raise_for_status()
+        if int(response.headers.get("x-ratelimit-remaining")) < 10:
+            time.sleep(2)
         page = response.json()
         # yield data only
         data = page['data']
